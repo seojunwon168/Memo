@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>심플 메모 리스트</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fc;
+            --container-bg: #ffffff;
+            --text-color: #333333;
+            --accent-color: #4e73df;
+            --accent-hover: #2e59d9;
+            --danger-color: #e74a3b;
+            --danger-hover: #be2617;
+            --success-color: #1cc88a;
+            --success-hover: #13855c;
+            --border-radius: 16px;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Changed to flex-start for scrolling list */
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        .memo-wrapper {
+            background: var(--container-bg);
+            padding: 40px 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 1.6rem;
+            color: #2c3e50;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border-bottom: 2px solid #f1f3f9;
+            padding-bottom: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 90px;
+            padding: 18px;
+            border: 2px solid #e3e6f0;
+            border-radius: 12px;
+            resize: none;
+            font-size: 1.05rem;
+            font-family: inherit;
+            color: var(--text-color);
+            box-sizing: border-box;
+            transition: var(--transition);
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(78, 115, 223, 0.15);
+        }
+
+        textarea::placeholder {
+            color: #b7b9cc;
+            font-weight: 400;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        button {
+            padding: 12px 0;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+
+        .btn-save { flex: 2; }
+        .btn-load { flex: 1; background-color: var(--success-color); }
+        .btn-load:hover { background-color: var(--success-hover); }
+
+        .list-section {
+            text-align: left;
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .list-header h2 {
+            font-size: 1.2rem;
+            margin: 0;
+            color: #4a5568;
+        }
+
+        #memoList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* 스크롤바 스타일링 */
+        #memoList::-webkit-scrollbar { width: 6px; }
+        #memoList::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        #memoList::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        #memoList::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+        .memo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background: #f8f9fc;
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid #e3e6f0;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .memo-content {
+            flex: 1;
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.5;
+            color: #4a5568;
+            margin-right: 15px;
+            font-size: 0.95rem;
+        }
+
+        .btn-delete-item {
+            background-color: transparent;
+            color: var(--danger-color);
+            padding: 8px;
+            border-radius: 8px;
+            width: auto;
+            flex: none;
+        }
+
+        .btn-delete-item:hover {
+            background-color: #fee2e2;
+            color: var(--danger-hover);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #a0aec0;
+            padding: 30px 0;
+            font-style: italic;
+        }
+
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 30px;
+            padding: 16px 24px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 40px;
+            transform: translateX(-50%) translateY(20px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<div class="memo-wrapper">
+    <h1>📝 스마트 메모 리스트</h1>
+    
+    <div class="input-section">
+        <textarea id="memoInput" placeholder="오늘의 중요한 아이디어나 잊지 말아야 할 내용을 작성해보세요 (2~3줄 권장)..."></textarea>
+        <div class="button-group">
+            <button class="btn-save" onclick="saveMemo()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                저장하기
+            </button>
+            <button class="btn-load" onclick="loadMemos(true)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                불러오기
+            </button>
+        </div>
+    </div>
+
+    <div class="list-section">
+        <div class="list-header">
+            <h2>메모 목록</h2>
+        </div>
+        <ul id="memoList">
+            <li class="empty-state">불러오기를 눌러 메모를 확인하세요.</li>
+        </ul>
+    </div>
+</div>
+
+<div id="toast">알림 메시지</div>
+
+<script>
+    const memoInput = document.getElementById('memoInput');
+    const memoList = document.getElementById('memoList');
+    const toast = document.getElementById('toast');
+
+    function showToast(message) {
+        toast.textContent = message;
+        toast.className = "show";
+        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    }
+
+    // 1. 저장 (화면 지우기 추가)
+    async function saveMemo() {
+        const content = memoInput.value.trim();
+        if (!content) {
+            showToast("⚠️ 메모를 입력해주세요.");
+            memoInput.focus();
+            return;
+        }
+        
+        try {
+            const response = await fetch('http://localhost:3000/api/memos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content })
+            });
+            if (response.ok) {
+                // 요구사항: 저장 후 입력 내용 화면에서 지우기
+                memoInput.value = '';
+                showToast("✅ 메모가 성공적으로 저장되었습니다.");
+                // 저장 후 목록 갱신을 위해 목록을 불러옵니다.
+                loadMemos(false); 
+            } else {
+                throw new Error('Save failed');
+            }
+        } catch (error) {
+            showToast("❌ 서버와 연결할 수 없거나 저장에 실패했습니다.");
+            console.error(error);
+        }
+    }
+
+    // 2. 불러오기 (목록으로 보여주기)
+    // showMessage 파라미터로 불러오기 버튼 클릭시만 토스트를 띄우도록 합니다.
+    async function loadMemos(showMessage = false) {
+        try {
+            const response = await fetch('http://localhost:3000/api/memos');
+            if (response.ok) {
+                const memos = await response.json();
+                renderMemoList(memos);
+                if (showMessage) {
+                    showToast("⬇️ 메모 목록을 성공적으로 불러왔습니다.");
+                }
+            } else {
+                throw new Error('Load failed');
+            }
+        } catch (error) {
+            if (showMessage) showToast("❌ 서버와 연결할 수 없거나 불러오기에 실패했습니다.");
+            console.error(error);
+        }
+    }
+
+    function renderMemoList(memos) {
+        memoList.innerHTML = '';
+        
+        if (memos.length === 0) {
+            memoList.innerHTML = '<li class="empty-state">저장된 메모가 없습니다.</li>';
+            return;
+        }
+
+        memos.forEach(memo => {
+            const li = document.createElement('li');
+            li.className = 'memo-item';
+            
+            // XSS 방지를 위한 텍스트 이스케이프 지원 (단순처리)
+            const textSpan = document.createElement('span');
+            textSpan.className = 'memo-content';
+            textSpan.textContent = memo.content;
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn-delete-item';
+            deleteBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>';
+            deleteBtn.onclick = () => deleteMemo(memo.id);
+
+            li.appendChild(textSpan);
+            li.appendChild(deleteBtn);
+            memoList.appendChild(li);
+        });
+    }
+
+    // 3. 삭제 (선택된 내용 삭제)
+    async function deleteMemo(id) {
+        if(confirm("이 메모를 삭제하시겠습니까?")) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/memos/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showToast("🗑️ 메모가 삭제되었습니다.");
+                    // 삭제 후 목록 다시 불러오기
+                    loadMemos(false);
+                } else {
+                    throw new Error('Delete failed');
+                }
+            } catch (error) {
+                showToast("❌ 서버와 연결할 수 없거나 삭제에 실패했습니다.");
+                console.error(error);
+            }
+        }
+    }
+
+    // 페이지 로드 시 자동으로 목록 불러오기
+    window.onload = () => loadMemos(false);
+
+</script>
+
+</body>
+</html>
