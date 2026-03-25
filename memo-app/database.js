@@ -1,9 +1,19 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./memo.db');
+const { Pool } = require('pg');
 
-db.serialize(() => {
-    // memos라는 테이블 생성 (id와 content 컬럼)
-    db.run("CREATE TABLE IF NOT EXISTS memos (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT)");
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
-module.exports = db;
+pool.query(`
+  CREATE TABLE IF NOT EXISTS memos (
+    id SERIAL PRIMARY KEY,
+    content TEXT NOT NULL
+  )
+`).catch(err => console.error("DB Init Error:", err));
+
+module.exports = {
+  query: (text, params) => pool.query(text, params),
+};
