@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="프리미어 리그 활약 선수들의 국가별 전적을 한눈에 확인하세요. 득점, 도움, 평점 등 실제 2023-24 시즌 데이터 제공." />
+  <title>Premier League Global | 국가별 선수 전적 플랫폼</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ─── 네비게이션 ─────────────────────────────────────────────────────── -->
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="#" class="nav-logo" id="nav-logo-link">
+      <span class="logo-icon">⚽</span>
+      <span class="logo-text">PL <span class="logo-accent">Global</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#" class="nav-link active" data-section="home" id="nav-home">홈</a></li>
+      <li><a href="#" class="nav-link" data-section="nations" id="nav-nations">국가 탐색</a></li>
+      <li><a href="#" class="nav-link" data-section="rankings" id="nav-rankings">랭킹</a></li>
+      <li><a href="#" class="nav-link" data-section="players" id="nav-players">선수 목록</a></li>
+    </ul>
+    <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+  </div>
+</nav>
+
+<!-- ─── 히어로 섹션 ───────────────────────────────────────────────────────── -->
+<section class="hero" id="section-home">
+  <div class="hero-bg">
+    <div class="hero-particle" style="--x:10%;--y:20%;--s:3px;--d:2s"></div>
+    <div class="hero-particle" style="--x:80%;--y:60%;--s:5px;--d:3s"></div>
+    <div class="hero-particle" style="--x:50%;--y:80%;--s:2px;--d:4s"></div>
+    <div class="hero-particle" style="--x:30%;--y:40%;--s:4px;--d:1.5s"></div>
+    <div class="hero-particle" style="--x:70%;--y:15%;--s:3px;--d:2.5s"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">⚽ 2023-24 시즌 실제 데이터</div>
+    <h1 class="hero-title">
+      전 세계 선수들의<br/>
+      <span class="hero-highlight">프리미어 리그</span> 전적
+    </h1>
+    <p class="hero-desc">
+      잉글랜드 프리미어 리그에서 활약하는 글로벌 선수들의 기록을<br/>
+      국가별로 한눈에 확인하세요.
+    </p>
+    <div class="hero-stats" id="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-num" id="stat-nations">—</span>
+        <span class="hero-stat-label">참가 국가</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num" id="stat-players">—</span>
+        <span class="hero-stat-label">등록 선수</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num" id="stat-goals">—</span>
+        <span class="hero-stat-label">총 득점</span>
+      </div>
+    </div>
+    <div class="hero-buttons">
+      <button class="btn-primary" id="btn-explore" onclick="scrollToSection('nations')">국가 탐색하기</button>
+      <button class="btn-secondary" id="btn-rankings" onclick="scrollToSection('rankings')">랭킹 보기</button>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-ring ring-1"></div>
+    <div class="hero-ring ring-2"></div>
+    <div class="hero-ring ring-3"></div>
+    <div class="hero-ball">⚽</div>
+  </div>
+</section>
+
+<!-- ─── 국가 탐색 ─────────────────────────────────────────────────────────── -->
+<section class="section" id="section-nations">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">🌍 국가별 탐색</h2>
+      <p class="section-desc">대륙을 선택하거나 국가 카드를 클릭해 해당 국가 선수들의 전적을 확인하세요.</p>
+    </div>
+
+    <!-- 대륙 필터 -->
+    <div class="continent-filters" id="continent-filters">
+      <button class="filter-btn active" data-continent="ALL" id="filter-all">전체</button>
+      <button class="filter-btn" data-continent="유럽" id="filter-europe">🌍 유럽</button>
+      <button class="filter-btn" data-continent="남미" id="filter-south-america">🌎 남미</button>
+      <button class="filter-btn" data-continent="아시아" id="filter-asia">🌏 아시아</button>
+      <button class="filter-btn" data-continent="아프리카" id="filter-africa">🌍 아프리카</button>
+    </div>
+
+    <!-- 국가 카드 그리드 -->
+    <div class="nations-grid" id="nations-grid">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>데이터 로딩 중...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 선수 목록 ─────────────────────────────────────────────────────────── -->
+<section class="section section-dark" id="section-players">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">👤 선수 전적 목록</h2>
+      <p class="section-desc">국가, 포지션, 정렬 기준을 선택하여 선수를 필터링하세요.</p>
+    </div>
+
+    <!-- 필터 바 -->
+    <div class="player-filters">
+      <div class="filter-group">
+        <label for="filter-nation">🌍 국가</label>
+        <select id="filter-nation" class="filter-select">
+          <option value="ALL">전체 국가</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-position">⚽ 포지션</label>
+        <select id="filter-position" class="filter-select">
+          <option value="ALL">전체</option>
+          <option value="GK">GK 골키퍼</option>
+          <option value="DF">DF 수비수</option>
+          <option value="MF">MF 미드필더</option>
+          <option value="FW">FW 공격수</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-sort">📊 정렬 기준</label>
+        <select id="filter-sort" class="filter-select">
+          <option value="goals">득점 순</option>
+          <option value="assists">도움 순</option>
+          <option value="rating">평점 순</option>
+          <option value="matches">출전 수 순</option>
+          <option value="clean_sheets">클린시트 순</option>
+        </select>
+      </div>
+      <button class="btn-primary btn-small" id="btn-apply-filter">적용</button>
+    </div>
+
+    <!-- 선수 테이블 -->
+    <div class="table-container">
+      <table class="players-table" id="players-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>선수</th>
+            <th>국적</th>
+            <th>클럽</th>
+            <th>포지션</th>
+            <th>출전</th>
+            <th>득점</th>
+            <th>도움</th>
+            <th>클린시트</th>
+            <th>경고</th>
+            <th>평점</th>
+          </tr>
+        </thead>
+        <tbody id="players-tbody">
+          <tr><td colspan="11" class="loading-cell"><div class="spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 랭킹 ──────────────────────────────────────────────────────────────── -->
+<section class="section" id="section-rankings">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">🏆 랭킹</h2>
+      <p class="section-desc">개인 및 국가별 성적 순위를 확인하세요.</p>
+    </div>
+
+    <div class="rankings-tabs">
+      <button class="tab-btn active" data-tab="goals" id="tab-goals">⚽ 득점</button>
+      <button class="tab-btn" data-tab="assists" id="tab-assists">🎯 도움</button>
+      <button class="tab-btn" data-tab="rating" id="tab-rating">⭐ 평점</button>
+      <button class="tab-btn" data-tab="clean_sheets" id="tab-clean-sheets">🧤 클린시트</button>
+      <button class="tab-btn" data-tab="nations" id="tab-nations-rank">🌍 국가 랭킹</button>
+    </div>
+
+    <div class="rankings-content" id="rankings-content">
+      <div class="loading-spinner"><div class="spinner"></div></div>
+    </div>
+
+    <!-- 차트 영역 -->
+    <div class="chart-container">
+      <h3 class="chart-title">국가별 총 득점 현황</h3>
+      <canvas id="nations-chart" height="120"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 선수 모달 ─────────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="player-modal">
+  <div class="modal-card">
+    <button class="modal-close" id="modal-close-btn">✕</button>
+    <div class="modal-content" id="modal-content">
+      <!-- JS로 주입 -->
+    </div>
+  </div>
+</div>
+
+<!-- ─── 푸터 ──────────────────────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-logo">⚽ PL Global</div>
+    <p class="footer-desc">2023-24 시즌 실제 데이터 기반 · 교육 목적의 비공식 팬 플랫폼</p>
+    <p class="footer-copy">© 2024 Premier League Global. 데이터 출처: FBref, Premier League Official</p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

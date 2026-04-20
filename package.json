@@ -1,0 +1,20 @@
+{
+  "name": "premier_league",
+  "version": "1.0.0",
+  "description": "Premier League Global - 국가별 선수 전적 플랫폼",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "init": "node init_db.js",
+    "dev": "node init_db.js && node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "sqlite3": "^6.0.1"
+  }
+}
